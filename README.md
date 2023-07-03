@@ -78,11 +78,13 @@ Generate the files for the population. The -s represents the scale factor which 
 ```  
 
 The generation of files will take some time. After completion, it will create a series of files ending with .tbl. To list them, type
-``
+
+```
 ls -l *.tbl
 ``` 
 
 Clone the tpch folder from this git repository. Inside the dbgen folder in shell type the code below.
+
 ```
 git clone https://github.com/dhuny/tpch.git
 ``` 
