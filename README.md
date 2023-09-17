@@ -70,50 +70,46 @@ Quit Nano or the text editor of choice by saving the changes.
 Inside the DBgen folder, run the make command.  
 ```
 make
-```  
-
-Generate the files for the population. The -s represents the scale factor which has properly defined values in TPC-H documentation and can be a minimum of 1, representing 1 GB. For testing purposes, 0.1 is used here, representing 100MB of data.  
 ```
-./dbgen -s 0.1
-```  
+  
+1. MySQL 서버를 동작
 
-The generation of files will take some time. After completion, it will create a series of files ending with .tbl. To list them, type
+`./mysql-8.0.24/build/bin/mysqld --defaults-file=./mysql-8.0.24/my.cnf`
 
-```
-ls -l *.tbl
-``` 
+2. TPC-H 로드하기
 
-Clone the tpch folder from this git repository. Inside the dbgen folder in shell type the code below.
+2-0. 사용법
 
-```
-git clone https://github.com/dhuny/tpch.git
-``` 
- 
-A new folder labelled tpch and contains 2 scripts required inside dbgen for execution. move them with the codes below 
-```
-mv ./tpch/import* tpch/tpch_* ./
-``` 
-Make sure that the codes are in dbgen folder. Then set the file to execution mode with chmod
-```
-chmod +x import_TPCH_to_MariaDB.sh
-chmod +x import_TPCH_to_MariaDB_with_view.sh
-``` 
+```./tpch-mysql/dbgen/dbgen -h```
 
-To execute the import_TPCH_to_MariaDB.sh, you will need the full administrative privileges of a database user. This is usually root access. On Shell type the following command.
-```
-./import_TPCH_to_MariaDB.sh root 
-```
-Or alternatively to execute the import_TPCH_to_MariaDB_with_view.sh. The with view command will create the necessary view for query 15. Used in test cases where the driver cannot run the Create View followed by a select from View in one operation set.
-```
-./import_TPCH_to_MariaDB_with_view.sh root 
-```
-The system will ask for the database password for root or the selected admin user. Once provided, the system will import the data into the database.
-The import_TPCH_to_MariaDB.sh  is simply executing the tpch_to_mariadb.sql script. In case the script does not work, The files can be manually edited to meet the requirements of the server 
+2-1. 데이터베이스 생성하기(데이터베이스 이름: IDS_TPCH)
 
-Once the make file is executed, TPC-H creates a folder in dbgen labelled queries that contains 22 queries for use to test the database. The queries require formatting for execution in MySQL and MariaDB.
-The GitHub repository has a folder labelled sample queries that contain sample queries similar to the 22 generated ones. Users may refer to them to adapt their generated queries from the dbgen/queries folder for MySQL and MariaDB.
+```mysqladmin create IDS_TPCH -uroot -p1234```
+
+2-2. 테이블 생성하기
+
+```mysql IDS_TPCH < ./tpch-mysql/dbgen/dss.ddl -uroot -p1234```
+
+2-3. 로드하기  
+
+```mysql IDS_TPCH < ./tpch-mysql/dbgen/dss.ri -uroot -p1234```
+
+2-4. 로드하기  
+sf 10 (10 GB / 실험을 위한 값임)   
+
+```./tpch-mysql/dbgen/dbgen -s 10```  -> .tbl 생성
+
+3. 쿼리 생성 
+
+` export DSS_QUERY=PATH_TO_QUERIES_FOLDER ` /.bashrc 에 추가 
 
 
-All information related to TPC & TPC-H are available on the website tpc.org and in the official documentation of TPC-H.
+```for i in {1..22}; do ./qgen $i > query-$i.sql; done```
+4. 쿼리 실행 
 
-I hope this work helps you.
+```for i in {1..22}; do mysql IDS_TPCH < ./tpch-mysql/dbgen/queries/query-$i.sql -uroot -p1234```
+
+
+
+
+
