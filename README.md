@@ -74,40 +74,57 @@ make
   
 1. MySQL 서버를 동작
 
-`./mysql-8.0.24/build/bin/mysqld --defaults-file=./mysql-8.0.24/my.cnf`
+```
+./mysql-8.0.24/build/bin/mysqld --defaults-file=./mysql-8.0.24/my.cnf
+```
 
 2. TPC-H 로드하기
 
 2-0. 사용법
 
-```./tpch-mysql/dbgen/dbgen -h```
+```
+./tpch-mysql/dbgen/dbgen -h
+```
 
 2-1. 데이터베이스 생성하기(데이터베이스 이름: IDS_TPCH)
 
-```mysqladmin create IDS_TPCH -uroot -p1234```
+```
+mysqladmin create IDS_TPCH -uroot -p1234
+```
 
 2-2. 테이블 생성하기
 
-```mysql IDS_TPCH < ./tpch-mysql/dbgen/dss.ddl -uroot -p1234```
+```
+mysql IDS_TPCH < ./tpch-mysql/dbgen/dss.ddl -uroot -p1234
+```
 
 2-3. 로드하기  
 
-```mysql IDS_TPCH < ./tpch-mysql/dbgen/dss.ri -uroot -p1234```
+```
+mysql IDS_TPCH < ./tpch-mysql/dbgen/dss.ri -uroot -p1234
+```
 
 2-4. 로드하기  
 sf 10 (10 GB / 실험을 위한 값임)   
 
-```./tpch-mysql/dbgen/dbgen -s 10```  -> .tbl 생성
+```
+./tpch-mysql/dbgen/dbgen -s 10
+```  
+-> .tbl 생성
 
 3. 쿼리 생성 
 
 ` export DSS_QUERY=PATH_TO_QUERIES_FOLDER ` /.bashrc 에 추가 
 
 
-```for i in {1..22}; do ./qgen $i > query-$i.sql; done```
+```
+for i in {1..22}; do ./qgen $i > query-$i.sql; done
+```
 4. 쿼리 실행 
 
-```for i in {1..22}; do mysql IDS_TPCH < ./tpch-mysql/dbgen/queries/query-$i.sql -uroot -p1234```
+```
+for i in {1..22}; do mysql IDS_TPCH < ./tpch-mysql/dbgen/queries/query-$i.sql -uroot -p1234
+```
 
 
 
