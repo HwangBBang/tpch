@@ -9,25 +9,14 @@ This work is based on [
 Catarina Ribeiro's port to MySQL ](https://github.com/catarinaribeir0/queries-tpch-dbgen-mysql). The previous work dates back to 2016, which used version 2.16 of TPC-H and was meant mainly for Windows-based machines.Because Linux systems are more strict with case sensitivity of characters, the existing SQL queries available do not work under Linux.
 This work reviewed the SQL queries and created a script to make the task easier. The script is only a helper to create the empty database structure,primary and foreign keys and import the generated data into a database.  All credits to the original author and the TPC team for making these tools available. Please consult the official documentation of TPC-H version 3.0.0 (published 18 February 2021).
 
-
 Implementation of TPC-H schema into MySQL and MariaDB. 
 
+
+0. 다운로드 
+ 
 [Visit the Downloads page of TPC and download the latest version of TPC-H](http://tpc.org/tpc_documents_current_versions/current_specifications5.asp)  
 
-Move the zipped folder to /tmp of the target Linux server. The downloaded file usually ends with *-tpc-h-tool.zip
-```
-mv *-tpc-h-tool.zip /tmp/ && cd /tmp
-``` 
-Unzip the downloaded file
-
-```
-unzip *-tpc-h-tool.zip
-``` 
-
-Navigate through the command line to DBGEN folder  
-```
-cd /tmp/TPC-H_Tools_v*/dbgen/
-```  
+ 
 
 Type make -v and gcc -v on shell to detect if necessary tools are installed.
 
@@ -41,12 +30,13 @@ Make a copy of the dummy makefile
 cp makefile.suite makefile
 ```  
 
-Still, in the dbgen folder edit the makefile with the command below to use Nano or alternative text editor.
+makfile 변경 
 ```
-sudo nano makefile
+sudo vim makefile
 ```  
  
-Find the values CC, DATABASE, MACHINE and WORKLOAD and change them as follows
+CC, DATABASE, MACHINE and WORKLOAD 변경
+
 ```
 ################
 ## CHANGE NAME OF ANSI COMPILER HERE
@@ -63,11 +53,9 @@ WORKLOAD = TPCH
 #
 ...
 ```  
+Inside the DBgen folder, run the make command.   
+make 는 makefile을 자동으로 찾아 컴파일함 
 
-Quit Nano or the text editor of choice by saving the changes.
-
-
-Inside the DBgen folder, run the make command.  
 ```
 make
 ```
