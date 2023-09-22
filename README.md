@@ -262,7 +262,7 @@ mysql> SELECT * FROM ORDERS LIMIT 10;
 ```
 
 
-4. 쿼리 실행
+6. 쿼리 실행
 
 mysqsl –u 유저 –p 데이터베이스명 < 파일명.sql
 
