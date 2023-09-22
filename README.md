@@ -1,40 +1,31 @@
-# TPC-H Benchmark helper for MySQL and MariaDB
+# TPC-H Benchmark on MySQL 
 
 
-The scripts hosted below are for implementing the TPC-H database, sample data and queries to MySQL and MariaDB Databases under Linux.
-TPC-H is a benchmark for Decision support made available by the Transaction Processing Performance Council (TPC). 
-ALL the necessary specifications and documentation for setting up the TPC-H database, generating data and queries are available on the [TPC Website (tpc.org)](http://tpc.org/tpc_documents_current_versions/current_specifications5.asp).
+e [TPC Website (tpc.org)](http://tpc.org/tpc_documents_current_versions/current_specifications5.asp).
 The generated items are SQL compliant and can be ported to all major relational databases. While the system can generate data for major databases, support for MYSQL and MariaDB shall benefit from further documentation.
 This work is based on [
-Catarina Ribeiro's port to MySQL ](https://github.com/catarinaribeir0/queries-tpch-dbgen-mysql). The previous work dates back to 2016, which used version 2.16 of TPC-H and was meant mainly for Windows-based machines.Because Linux systems are more strict with case sensitivity of characters, the existing SQL queries available do not work under Linux.
-This work reviewed the SQL queries and created a script to make the task easier. The script is only a helper to create the empty database structure,primary and foreign keys and import the generated data into a database.  All credits to the original author and the TPC team for making these tools available. Please consult the official documentation of TPC-H version 3.0.0 (published 18 February 2021).
 
-
-Implementation of TPC-H schema into MySQL and MariaDB. 
+Implementation of TPC-H schema into MySQL 
 
 [Visit the Downloads page of TPC and download the latest version of TPC-H](http://tpc.org/tpc_documents_current_versions/current_specifications5.asp)  
 
-Move the zipped folder to /tmp of the target Linux server. The downloaded file usually ends with *-tpc-h-tool.zip
-```
-mv *-tpc-h-tool.zip /tmp/ && cd /tmp
-``` 
-Unzip the downloaded file
+
+dbgen은 TPC-H를 위한 텍스트 파일을 생성해 주는 프로그램
+
+이 텍스트 파일을 MySQL의 LOAD DATA 구문을 이용하여 테이블에 로딩 한다 
+
+
+__dbgen 확인해주기__
 
 ```
-unzip *-tpc-h-tool.zip
-``` 
-
-Navigate through the command line to DBGEN folder  
+$ time ./dbgen
+TPC-H Population Generator (Version 2.16.0)
+Copyright Transaction Processing Performance Council 1994 - 2010
+ 
+real    0m39.142s
+user    0m38.165s
+sys     0m0.903s
 ```
-cd /tmp/TPC-H_Tools_v*/dbgen/
-```  
-
-Type make -v and gcc -v on shell to detect if necessary tools are installed.
-
-Install ‘make’ and ‘gcc’ if not available. If both are not present, the command below shall help in ubuntu
-```
-sudo apt install make && sudo apt install gcc -y
-```  
 
 Make a copy of the dummy makefile  
 ```
@@ -66,85 +57,67 @@ WORKLOAD = TPCH
 Inside the DBgen folder, run the make command.   
 make 는 makefile을 자동으로 찾아 컴파일함 
 
-
-Generate the files for the population. The -s represents the scale factor which has properly defined values in TPC-H documentation and can be a minimum of 1, representing 1 GB. For testing purposes, 0.1 is used here, representing 100MB of data.  
-```
-./dbgen -s 0.1
-```  
-
-The generation of files will take some time. After completion, it will create a series of files ending with .tbl. To list them, type
-```
-ls -l *.tbl
-``` 
-
-Clone the tpch folder from this git repository. Inside the dbgen folder in shell type the code below.
-```
-git clone https://github.com/dhuny/tpch.git
-``` 
- 
-A new folder labelled tpch and contains 2 scripts required inside dbgen for execution. move them with the codes below 
-```
-mv ./tpch/import* tpch/tpch_* ./
-``` 
-Make sure that the codes are in dbgen folder. Then set the file to execution mode with chmod
-```
-chmod +x import_TPCH_to_MariaDB.sh
-chmod +x import_TPCH_to_MariaDB_with_view.sh
-``` 
-
-To execute the import_TPCH_to_MariaDB.sh, you will need the full administrative privileges of a database user. This is usually root access. On Shell type the following command.
-```
-./import_TPCH_to_MariaDB.sh root 
-```
-Or alternatively to execute the import_TPCH_to_MariaDB_with_view.sh. The with view command will create the necessary view for query 15. Used in test cases where the driver cannot run the Create View followed by a select from View in one operation set.
-```
-./import_TPCH_to_MariaDB_with_view.sh root 
-```
-The system will ask for the database password for root or the selected admin user. Once provided, the system will import the data into the database.
-The import_TPCH_to_MariaDB.sh  is simply executing the tpch_to_mariadb.sql script. In case the script does not work, The files can be manually edited to meet the requirements of the server 
-
-Once the make file is executed, TPC-H creates a folder in dbgen labelled queries that contains 22 queries for use to test the database. The queries require formatting for execution in MySQL and MariaDB.
-The GitHub repository has a folder labelled sample queries that contain sample queries similar to the 22 generated ones. Users may refer to them to adapt their generated queries from the dbgen/queries folder for MySQL and MariaDB.
-
-
-All information related to TPC & TPC-H are available on the website tpc.org and in the official documentation of TPC-H.
-
-I hope this work helps you.
-
-makfile 변경 
-```
-sudo vim makefile
-```  
- 
-CC, DATABASE, MACHINE and WORKLOAD 변경
-
-```
-################
-## CHANGE NAME OF ANSI COMPILER HERE
-################
-CC      = gcc
-# Current values for DATABASE are: INFORMIX, DB2, TDAT (Teradata)
-#                                  SQLSERVER, SYBASE, ORACLE, VECTORWISE
-# Current values for MACHINE are:  ATT, DOS, HP, IBM, ICL, MVS, 
-#                                  SGI, SUN, U2200, VMS, LINUX, WIN32 
-# Current values for WORKLOAD are:  TPCH
-DATABASE= ORACLE
-MACHINE = LINUX
-WORKLOAD = TPCH
-#
-...
-```  
-Inside the DBgen folder, run the make command.   
-make 는 makefile을 자동으로 찾아 컴파일함 
-
 ```
 make
 ```
-  
+
+컴파일 후 DATA 구문을 이용하여  scale factor = 10 으로 테이블에 로딩
+
+```
+$ ./dbgen -s 10
+```
+-s 1 인 경우 8개 의 테이블 860만 개 튜플이 생성된다. 
+-s 10 인 경우는 8개의 테이블에 8600만개 튜플이 생성될 것이다 .
+
+잘 생성되었나 확인해보자 
+
+```
+$ wc -l *.tbl
+
+
+sf -1 일때 
+hwangbbang@ids-srv4:~/tpch-mysql/dbgen $ wc -l *.tbl
+    150000 customer.tbl (고객 테이블용 데이터)
+   6001215 lineitem.tbl
+        25 nation.tbl
+   1500000 orders.tbl (주문 테이블용 데이터)
+    800000 partsupp.tbl
+    200000 part.tbl
+         5 region.tbl
+     10000 supplier.tbl
+   8661245 total
+
+
+sf -10 일때 
+hwangbbang@ids-srv4:~/tpch-mysql/dbgen$ wc -l *.tbl
+    1500000 customer.tbl
+   59986052 lineitem.tbl
+         25 nation.tbl
+   15000000 orders.tbl
+    8000000 partsupp.tbl
+    2000000 part.tbl
+          5 region.tbl
+     100000 supplier.tbl
+   86586082 total
+
+```
+
+
+이제 primary key와 foreign key를 설정해줘야한다 .. 
+
+
+
 1. MySQL 서버를 동작
 
 ```
 ./mysql-8.0.24/build/bin/mysqld --defaults-file=./mysql-8.0.24/my.cnf
+```
+1-1 MySQL 접속
+
+```
+mysql -u root -p --local-infile (mysql에서 현재디렉토리에 있는 dbgen로컬파일을 사용한다.)
+$ mysql> CREATE DATABASE IDS_TPCH;
+$ mysql> USE IDS_TPCH;
 ```
 
 2. TPC-H 로드하기
@@ -196,6 +169,13 @@ for i in {1..22}; do mysql IDS_TPCH < ./tpch-mysql/dbgen/queries/query-$i.sql -u
 ```
 
 
+### 출처 
 
+https://www.tpc.org/ 
 
+https://velog.io/@shinyehwan/TPC-H 
+
+https://sjp38.github.io/ko/post/tpch-on-mariadb/
+
+https://ycseo.tistory.com/21 
 
